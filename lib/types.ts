@@ -5,6 +5,8 @@ export interface Charity {
   name: string;
   tagline: string;
   icon: LucideIcon;
+  /** Optional banner photo path under /public; falls back to the icon when unset */
+  photo?: string;
   /** Solid hex used for the donate button + small UI accents */
   accent: string;
   /** Soft hex wash used behind the cause banner */

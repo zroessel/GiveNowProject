@@ -46,6 +46,7 @@ export const charities: Charity[] = [
     name: "Rootline Reforestation Fund",
     tagline: "Plants native trees to restore forests degraded by wildfire and logging.",
     icon: TreePine,
+    photo: "/charities/rootline-reforestation.jpg",
     accent: "#6B8F55",
     tint: "#EAF1E3",
     costPerUnitCad: 0.5,

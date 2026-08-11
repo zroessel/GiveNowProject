@@ -1,7 +1,35 @@
+import Image from "next/image";
 import type { Charity } from "@/lib/types";
 
 export default function CauseCard({ charity }: { charity: Charity }) {
   const Icon = charity.icon;
+
+  if (charity.photo) {
+    return (
+      <div
+        key={charity.id}
+        className="animate-pop-in relative w-full overflow-hidden rounded-3xl shadow-sm"
+        style={{ backgroundColor: charity.tint }}
+      >
+        <div className="relative h-32 w-full">
+          <Image
+            src={charity.photo}
+            alt=""
+            fill
+            priority
+            sizes="(max-width: 640px) 100vw, 420px"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+        </div>
+        <div className="absolute inset-x-0 bottom-0 px-4 pb-3">
+          <p className="truncate text-[15px] font-extrabold leading-tight text-white">{charity.name}</p>
+          <p className="truncate text-[12.5px] leading-snug text-white/80">{charity.tagline}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       key={charity.id}
