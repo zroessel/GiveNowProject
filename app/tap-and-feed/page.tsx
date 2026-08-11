@@ -5,6 +5,7 @@ import { TAP_DONATION_AMOUNT_CAD } from "@/lib/impact";
 import { useImpact } from "@/lib/impact-store";
 import AnimalTile from "@/components/AnimalTile";
 import ImpactMeter from "@/components/ImpactMeter";
+import Logo from "@/components/Logo";
 
 export default function TapAndFeedPage() {
   const { addContribution } = useImpact();
@@ -17,7 +18,7 @@ export default function TapAndFeedPage() {
       />
 
       <header className="flex items-center justify-between px-5 pt-[calc(0.75rem+env(safe-area-inset-top))]">
-        <span className="text-sm font-extrabold tracking-tight text-clay/70">Tap &amp; Feed</span>
+        <Logo />
         <ImpactMeter />
       </header>
 

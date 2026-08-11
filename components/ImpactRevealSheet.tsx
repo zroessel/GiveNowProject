@@ -1,17 +1,18 @@
 "use client";
 
 import type { Charity } from "@/lib/types";
-import { formatMeals, getImpactStatement, UNIVERSAL_UNIT_LABEL } from "@/lib/impact";
+import { formatMeals, UNIVERSAL_UNIT_LABEL } from "@/lib/impact";
 
 interface Props {
   charity: Charity;
+  units: number;
   amountCad: number;
   totalMeals: number;
   onClose: () => void;
 }
 
-export default function ImpactRevealSheet({ charity, amountCad, totalMeals, onClose }: Props) {
-  const impact = getImpactStatement(charity, amountCad);
+export default function ImpactRevealSheet({ charity, units, amountCad, totalMeals, onClose }: Props) {
+  const impact = charity.describeImpact(units);
 
   return (
     <div className="absolute inset-0 z-50 flex items-end justify-center bg-clay/40 backdrop-blur-[2px]">
@@ -29,7 +30,7 @@ export default function ImpactRevealSheet({ charity, amountCad, totalMeals, onCl
           Donation sent
         </p>
         <h2 className="mt-1.5 text-center text-2xl font-extrabold leading-snug text-clay">
-          ${amountCad} CAD ={" "}
+          ${amountCad.toFixed(2)} CAD ={" "}
           <span style={{ color: charity.accent }}>{impact}</span>
         </h2>
         <p className="mt-2 text-center text-[13px] text-clay/55">

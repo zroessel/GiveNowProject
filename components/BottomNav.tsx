@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Heart, PawPrint } from "lucide-react";
 
 const TABS = [
-  { href: "/", label: "Give", icon: "💛" },
-  { href: "/tap-and-feed", label: "Tap & Feed", icon: "🐣" },
+  { href: "/", label: "Give", icon: Heart },
+  { href: "/tap-and-feed", label: "Tap & Feed", icon: PawPrint },
 ] as const;
 
 export default function BottomNav() {
@@ -19,17 +20,22 @@ export default function BottomNav() {
       <div className="mx-auto flex max-w-md items-stretch justify-around">
         {TABS.map((tab) => {
           const active = pathname === tab.href;
+          const Icon = tab.icon;
           return (
             <Link
               key={tab.href}
               href={tab.href}
-              className="flex flex-1 flex-col items-center gap-0.5 py-2.5 text-center"
+              className="flex flex-1 flex-col items-center gap-1 py-2.5 text-center"
             >
-              <span
-                className={`text-xl leading-none transition-transform ${active ? "scale-110" : "opacity-50"}`}
-              >
-                {tab.icon}
-              </span>
+              <Icon
+                size={22}
+                strokeWidth={active ? 2.5 : 2}
+                fill={active ? "currentColor" : "none"}
+                fillOpacity={active ? 0.15 : 0}
+                className={`transition-transform ${
+                  active ? "scale-110 text-terracotta-deep" : "scale-100 text-clay/40"
+                }`}
+              />
               <span
                 className={`text-[11px] font-bold tracking-tight transition-colors ${
                   active ? "text-terracotta-deep" : "text-clay/45"

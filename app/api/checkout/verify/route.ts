@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { DONATION_AMOUNT_CAD } from "@/lib/impact";
 import { getStripeClient } from "@/lib/stripe";
 
 export async function GET(request: Request) {
@@ -22,8 +21,7 @@ export async function GET(request: Request) {
   return NextResponse.json({
     paid: true,
     causeId: session.metadata?.causeId ?? null,
-    amountCad: session.metadata?.amountCad
-      ? Number(session.metadata.amountCad)
-      : DONATION_AMOUNT_CAD,
+    units: session.metadata?.units ? Number(session.metadata.units) : null,
+    amountCad: session.metadata?.amountCad ? Number(session.metadata.amountCad) : null,
   });
 }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { charities } from "@/lib/charities";
-import { DONATION_AMOUNT_CAD } from "@/lib/impact";
+import { clampUnits, unitsToAmountCad } from "@/lib/impact";
 import { getStripeClient } from "@/lib/stripe";
 
 export async function POST(request: Request) {
@@ -11,6 +11,13 @@ export async function POST(request: Request) {
   if (!charity) {
     return NextResponse.json({ error: "Unknown cause" }, { status: 400 });
   }
+
+  // The charge amount is always derived here from the charity's own
+  // cost-per-unit and a clamped unit count — never trust a dollar amount
+  // sent by the client, or a tampered request could under-pay for the
+  // impact statement it gets shown.
+  const units = clampUnits(Number(body?.units));
+  const amountCad = unitsToAmountCad(charity, units);
 
   const stripe = getStripeClient();
   if (!stripe) {
@@ -28,10 +35,10 @@ export async function POST(request: Request) {
       {
         price_data: {
           currency: "cad",
-          unit_amount: Math.round(DONATION_AMOUNT_CAD * 100),
+          unit_amount: Math.round(amountCad * 100),
           product_data: {
             name: `Donation to ${charity.name}`,
-            description: charity.tagline,
+            description: `${units} ${units === 1 ? charity.unitSingular : charity.unitPlural} — ${charity.tagline}`,
           },
         },
         quantity: 1,
@@ -39,7 +46,8 @@ export async function POST(request: Request) {
     ],
     metadata: {
       causeId: charity.id,
-      amountCad: String(DONATION_AMOUNT_CAD),
+      units: String(units),
+      amountCad: String(amountCad),
     },
     success_url: `${origin}/?donated=1&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/?donation=cancelled`,

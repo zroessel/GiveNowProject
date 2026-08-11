@@ -1,6 +1,8 @@
 import type { Charity } from "./types";
 
 // Illustrative, fictional causes for demo purposes — not real nonprofits.
+// Cost-per-unit figures are calibrated to be realistic (large food banks
+// commonly cite roughly $0.10–$0.25 per meal), not pulled from any real org.
 export const charities: Charity[] = [
   {
     id: "harvest-table",
@@ -9,10 +11,10 @@ export const charities: Charity[] = [
     emoji: "🍲",
     accent: "#E2703A",
     tint: "#FBEAE0",
-    outcomes: [
-      { amountCad: 5, impact: "2 hot meals delivered this week" },
-      { amountCad: 10, impact: "4 hot meals delivered this week" },
-    ],
+    costPerUnitCad: 0.2,
+    unitSingular: "meal",
+    unitPlural: "meals",
+    describeImpact: (n) => `${n} hot meal${n === 1 ? "" : "s"} delivered this week`,
   },
   {
     id: "clearwell-project",
@@ -21,10 +23,10 @@ export const charities: Charity[] = [
     emoji: "💧",
     accent: "#3C9D8F",
     tint: "#E3F3F0",
-    outcomes: [
-      { amountCad: 5, impact: "50 litres of clean water pumped" },
-      { amountCad: 10, impact: "100 litres of clean water pumped" },
-    ],
+    costPerUnitCad: 0.2,
+    unitSingular: "litre",
+    unitPlural: "litres",
+    describeImpact: (n) => `${n} litre${n === 1 ? "" : "s"} of clean water pumped`,
   },
   {
     id: "bright-page",
@@ -33,10 +35,10 @@ export const charities: Charity[] = [
     emoji: "📚",
     accent: "#D9A441",
     tint: "#FBF1DD",
-    outcomes: [
-      { amountCad: 5, impact: "3 storybooks placed in a classroom" },
-      { amountCad: 10, impact: "6 storybooks placed in a classroom" },
-    ],
+    costPerUnitCad: 1.5,
+    unitSingular: "book",
+    unitPlural: "books",
+    describeImpact: (n) => `${n} storybook${n === 1 ? "" : "s"} placed in a classroom`,
   },
   {
     id: "small-paws",
@@ -45,10 +47,10 @@ export const charities: Charity[] = [
     emoji: "🐾",
     accent: "#C1666B",
     tint: "#FAE7E8",
-    outcomes: [
-      { amountCad: 5, impact: "5 days of shelter meals for a rescued dog" },
-      { amountCad: 10, impact: "10 days of shelter meals for a rescued dog" },
-    ],
+    costPerUnitCad: 1.0,
+    unitSingular: "day of care",
+    unitPlural: "days of care",
+    describeImpact: (n) => `${n} day${n === 1 ? "" : "s"} of shelter meals for a rescued animal`,
   },
   {
     id: "warm-nights",
@@ -57,10 +59,10 @@ export const charities: Charity[] = [
     emoji: "🧣",
     accent: "#A65B3F",
     tint: "#F3E4DC",
-    outcomes: [
-      { amountCad: 5, impact: "1 warm blanket + hot meal given out tonight" },
-      { amountCad: 10, impact: "2 warm blankets + hot meals given out tonight" },
-    ],
+    costPerUnitCad: 2.5,
+    unitSingular: "bundle",
+    unitPlural: "bundles",
+    describeImpact: (n) => `${n} blanket + hot meal bundle${n === 1 ? "" : "s"} given out tonight`,
   },
   {
     id: "seedling-forest",
@@ -69,10 +71,10 @@ export const charities: Charity[] = [
     emoji: "🌱",
     accent: "#6B8F55",
     tint: "#EAF1E3",
-    outcomes: [
-      { amountCad: 5, impact: "10 native trees planted" },
-      { amountCad: 10, impact: "20 native trees planted" },
-    ],
+    costPerUnitCad: 0.5,
+    unitSingular: "tree",
+    unitPlural: "trees",
+    describeImpact: (n) => `${n} native tree${n === 1 ? "" : "s"} planted`,
   },
   {
     id: "first-light-health",
@@ -81,17 +83,13 @@ export const charities: Charity[] = [
     emoji: "🩺",
     accent: "#D98555",
     tint: "#FBEDE1",
-    outcomes: [
-      { amountCad: 5, impact: "1 child vaccinated against measles" },
-      { amountCad: 10, impact: "2 children vaccinated against measles" },
-    ],
+    costPerUnitCad: 2.0,
+    unitSingular: "vaccine",
+    unitPlural: "vaccines",
+    describeImpact: (n) => `${n} child${n === 1 ? "" : "ren"} vaccinated against measles`,
   },
 ];
 
-/** Deterministic "cause of the day" — rotates once every 24 hours. */
-export function getCauseOfTheDayIndex(date: Date = new Date()): number {
-  const start = new Date(date.getFullYear(), 0, 0);
-  const diffMs = date.getTime() - start.getTime();
-  const dayOfYear = Math.floor(diffMs / 86_400_000);
-  return dayOfYear % charities.length;
+export function getCharityById(id: string): Charity {
+  return charities.find((c) => c.id === id) ?? charities[0];
 }

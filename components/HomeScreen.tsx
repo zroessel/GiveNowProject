@@ -1,16 +1,19 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { charities, getCauseOfTheDayIndex } from "@/lib/charities";
-import { DONATION_AMOUNT_CAD } from "@/lib/impact";
+import { ChevronDown, Minus, Plus } from "lucide-react";
+import { charities, getCharityById } from "@/lib/charities";
+import { DEFAULT_UNITS, MAX_UNITS, MIN_UNITS, clampUnits, unitsToAmountCad } from "@/lib/impact";
 import { useImpact } from "@/lib/impact-store";
 import CauseCard from "@/components/CauseCard";
 import ImpactMeter from "@/components/ImpactMeter";
 import ImpactRevealSheet from "@/components/ImpactRevealSheet";
+import Logo from "@/components/Logo";
 
 interface RevealState {
   charityId: string;
+  units: number;
   amountCad: number;
 }
 
@@ -19,16 +22,22 @@ export default function HomeScreen() {
   const searchParams = useSearchParams();
   const { totalMeals, addContribution } = useImpact();
 
-  const [causeIndex, setCauseIndex] = useState(() => getCauseOfTheDayIndex());
+  const [charityId, setCharityId] = useState(charities[0].id);
+  const [units, setUnits] = useState(DEFAULT_UNITS);
   const [donating, setDonating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reveal, setReveal] = useState<RevealState | null>(null);
   const processedSessionRef = useRef<string | null>(null);
 
-  const charity = charities[causeIndex];
+  const charity = getCharityById(charityId);
+  const amountCad = useMemo(() => unitsToAmountCad(charity, units), [charity, units]);
 
-  const handleNextCause = useCallback(() => {
-    setCauseIndex((i) => (i + 1) % charities.length);
+  const handleDecrement = useCallback(() => {
+    setUnits((u) => clampUnits(u - 1));
+  }, []);
+
+  const handleIncrement = useCallback(() => {
+    setUnits((u) => clampUnits(u + 1));
   }, []);
 
   const handleDonate = useCallback(async () => {
@@ -38,7 +47,7 @@ export default function HomeScreen() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ causeId: charity.id }),
+        body: JSON.stringify({ causeId: charity.id, units }),
       });
       const data = await res.json();
 
@@ -49,8 +58,8 @@ export default function HomeScreen() {
 
       if (data.simulated) {
         await new Promise((r) => setTimeout(r, 450));
-        addContribution(DONATION_AMOUNT_CAD);
-        setReveal({ charityId: charity.id, amountCad: DONATION_AMOUNT_CAD });
+        addContribution(amountCad);
+        setReveal({ charityId: charity.id, units, amountCad });
         setDonating(false);
         return;
       }
@@ -60,7 +69,7 @@ export default function HomeScreen() {
       setError("Couldn't start checkout. Please try again.");
       setDonating(false);
     }
-  }, [charity.id, addContribution]);
+  }, [charity.id, units, amountCad, addContribution]);
 
   // Handle the redirect back from Stripe Checkout.
   useEffect(() => {
@@ -82,11 +91,10 @@ export default function HomeScreen() {
         try {
           const res = await fetch(`/api/checkout/verify?session_id=${encodeURIComponent(sessionId)}`);
           const data = await res.json();
-          if (data.paid) {
-            const amountCad = data.amountCad ?? DONATION_AMOUNT_CAD;
-            const paidCharity = charities.find((c) => c.id === data.causeId) ?? charity;
-            addContribution(amountCad);
-            setReveal({ charityId: paidCharity.id, amountCad });
+          if (data.paid && data.causeId && data.units && data.amountCad) {
+            const paidCharity = getCharityById(data.causeId);
+            addContribution(data.amountCad);
+            setReveal({ charityId: paidCharity.id, units: data.units, amountCad: data.amountCad });
           } else {
             setError("Payment wasn't completed.");
           }
@@ -100,7 +108,8 @@ export default function HomeScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
-  const revealCharity = reveal ? charities.find((c) => c.id === reveal.charityId) : null;
+  const revealCharity = reveal ? getCharityById(reveal.charityId) : null;
+  const unitLabel = units === 1 ? charity.unitSingular : charity.unitPlural;
 
   return (
     <div className="relative flex h-full flex-1 flex-col">
@@ -110,19 +119,66 @@ export default function HomeScreen() {
       />
 
       <header className="flex items-center justify-between px-5 pt-[calc(0.75rem+env(safe-area-inset-top))]">
-        <span className="text-sm font-extrabold tracking-tight text-clay/70">GiveNow</span>
+        <Logo />
         <ImpactMeter />
       </header>
 
-      <main className="flex flex-1 flex-col items-center justify-center gap-8 px-6">
+      <main className="flex flex-1 flex-col items-center justify-center gap-7 px-5">
         <CauseCard charity={charity} />
 
-        <button
-          onClick={handleNextCause}
-          className="text-[13px] font-bold text-clay/45 underline decoration-clay/25 underline-offset-4 active:text-clay/70"
-        >
-          Not this one? Try another cause →
-        </button>
+        <div className="flex items-center justify-center gap-5">
+          <button
+            onClick={handleDecrement}
+            disabled={units <= MIN_UNITS}
+            aria-label={`Fewer ${charity.unitPlural}`}
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-clay/10 transition-transform active:scale-90 disabled:opacity-30"
+            style={{ color: charity.accent }}
+          >
+            <Minus size={20} strokeWidth={3} />
+          </button>
+
+          <div className="flex w-36 flex-col items-center">
+            <span className="text-[34px] font-extrabold leading-none text-clay">
+              ${amountCad.toFixed(2)}
+            </span>
+            <span
+              className="mt-1.5 text-[13px] font-bold leading-none"
+              style={{ color: charity.accent }}
+            >
+              = {units} {unitLabel}
+            </span>
+          </div>
+
+          <button
+            onClick={handleIncrement}
+            disabled={units >= MAX_UNITS}
+            aria-label={`More ${charity.unitPlural}`}
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-clay/10 transition-transform active:scale-90 disabled:opacity-30"
+            style={{ color: charity.accent }}
+          >
+            <Plus size={20} strokeWidth={3} />
+          </button>
+        </div>
+
+        <div className="relative w-full max-w-[240px]">
+          <select
+            value={charity.id}
+            onChange={(e) => setCharityId(e.target.value)}
+            aria-label="Change charity"
+            className="w-full appearance-none rounded-full border border-clay/15 bg-white/70 py-2.5 pl-4 pr-9 text-center text-[13px] font-bold text-clay/70"
+          >
+            {charities.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.emoji} {c.name}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            size={16}
+            strokeWidth={2.5}
+            className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-clay/40"
+          />
+        </div>
       </main>
 
       <footer className="flex flex-col items-center gap-2.5 px-6 pb-6">
@@ -133,16 +189,15 @@ export default function HomeScreen() {
           className="w-full max-w-sm rounded-full py-5 text-[17px] font-extrabold text-white shadow-xl transition-transform active:scale-[0.97] disabled:opacity-70"
           style={{ backgroundColor: charity.accent }}
         >
-          {donating ? "Sending your gift…" : `Donate $${DONATION_AMOUNT_CAD} CAD`}
+          {donating ? "Sending your gift…" : `Donate $${amountCad.toFixed(2)} CAD`}
         </button>
-        <p className="text-[11px] font-medium text-clay/35">
-          Concept demo · no real charge
-        </p>
+        <p className="text-[11px] font-medium text-clay/35">Concept demo · no real charge</p>
       </footer>
 
       {reveal && revealCharity && (
         <ImpactRevealSheet
           charity={revealCharity}
+          units={reveal.units}
           amountCad={reveal.amountCad}
           totalMeals={totalMeals}
           onClose={() => setReveal(null)}
