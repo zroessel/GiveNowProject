@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { charities } from "@/lib/charities";
-import { clampUnits, unitsToAmountCad } from "@/lib/impact";
+import { STRIPE_MIN_CHARGE_CAD, clampUnits, unitsToAmountCad } from "@/lib/impact";
 import { getStripeClient } from "@/lib/stripe";
 
 export async function POST(request: Request) {
@@ -16,14 +16,23 @@ export async function POST(request: Request) {
   // cost-per-unit and a clamped unit count — never trust a dollar amount
   // sent by the client, or a tampered request could under-pay for the
   // impact statement it gets shown.
-  const units = clampUnits(Number(body?.units));
-  const amountCad = unitsToAmountCad(charity, units);
+  let units = clampUnits(Number(body?.units));
+  let amountCad = unitsToAmountCad(charity, units);
 
   const stripe = getStripeClient();
   if (!stripe) {
     // No Stripe test keys configured — let the client fall back to a
     // simulated instant success so the demo still runs with zero setup.
     return NextResponse.json({ simulated: true });
+  }
+
+  // The stepper allows amounts as low as one unit (e.g. $0.20), but Stripe
+  // rejects charges below its per-currency minimum. Bump the unit count up
+  // to the smallest amount that clears it rather than letting the API call
+  // fail — the response always reflects what's actually charged.
+  if (amountCad < STRIPE_MIN_CHARGE_CAD) {
+    units = clampUnits(Math.ceil(STRIPE_MIN_CHARGE_CAD / charity.costPerUnitCad));
+    amountCad = unitsToAmountCad(charity, units);
   }
 
   const origin = request.headers.get("origin") ?? new URL(request.url).origin;

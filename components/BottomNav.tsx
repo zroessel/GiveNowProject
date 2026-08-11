@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Heart, PawPrint } from "lucide-react";
+import { Heart, PawPrint, Settings } from "lucide-react";
 
 const TABS = [
   { href: "/", label: "Give", icon: Heart },
   { href: "/tap-and-feed", label: "Tap & Feed", icon: PawPrint },
+  { href: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
 export default function BottomNav() {

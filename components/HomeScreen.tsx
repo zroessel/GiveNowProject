@@ -20,7 +20,7 @@ interface RevealState {
 export default function HomeScreen() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { totalMeals, addContribution } = useImpact();
+  const { totalDonatedCad, addContribution } = useImpact();
 
   const [charityId, setCharityId] = useState(charities[0].id);
   const [units, setUnits] = useState(DEFAULT_UNITS);
@@ -199,7 +199,7 @@ export default function HomeScreen() {
           charity={revealCharity}
           units={reveal.units}
           amountCad={reveal.amountCad}
-          totalMeals={totalMeals}
+          totalDonatedCad={totalDonatedCad}
           onClose={() => setReveal(null)}
         />
       )}

@@ -1,17 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Utensils } from "lucide-react";
+import { HandCoins } from "lucide-react";
 import { useImpact } from "@/lib/impact-store";
-import { formatMeals, UNIVERSAL_UNIT_LABEL } from "@/lib/impact";
+import { formatCad } from "@/lib/impact";
 
 export default function ImpactMeter() {
-  const { totalMeals } = useImpact();
-  const [prevTotal, setPrevTotal] = useState(totalMeals);
+  const { totalDonatedCad } = useImpact();
+  const [prevTotal, setPrevTotal] = useState(totalDonatedCad);
   const [pulse, setPulse] = useState(false);
 
-  if (totalMeals !== prevTotal) {
-    setPrevTotal(totalMeals);
+  if (totalDonatedCad !== prevTotal) {
+    setPrevTotal(totalDonatedCad);
     setPulse(true);
   }
 
@@ -28,9 +28,9 @@ export default function ImpactMeter() {
       }`}
       aria-live="polite"
     >
-      <Utensils size={15} strokeWidth={2.25} className="text-terracotta-deep" aria-hidden />
+      <HandCoins size={15} strokeWidth={2.25} className="text-terracotta-deep" aria-hidden />
       <span className="text-[13px] font-bold text-clay">
-        {formatMeals(totalMeals)} <span className="font-semibold text-clay/60">{UNIVERSAL_UNIT_LABEL} given</span>
+        {formatCad(totalDonatedCad)} <span className="font-semibold text-clay/60">donated</span>
       </span>
     </div>
   );

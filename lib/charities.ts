@@ -1,4 +1,4 @@
-import { Droplet, Home, TreePine, Wheat } from "lucide-react";
+import { BookOpen, Droplet, Home, TreePine, Wheat } from "lucide-react";
 import type { Charity } from "./types";
 
 // Illustrative, fictional causes for demo purposes — not real nonprofits.
@@ -52,6 +52,18 @@ export const charities: Charity[] = [
     unitSingular: "tree",
     unitPlural: "trees",
     describeImpact: (n) => `${n} native tree${n === 1 ? "" : "s"} planted`,
+  },
+  {
+    id: "chalkline-education",
+    name: "Chalkline Education Fund",
+    tagline: "Supplies classrooms and pays local teachers in under-resourced schools.",
+    icon: BookOpen,
+    accent: "#D9A441",
+    tint: "#FBF1DD",
+    costPerUnitCad: 1.5,
+    unitSingular: "textbook",
+    unitPlural: "textbooks",
+    describeImpact: (n) => `${n} textbook${n === 1 ? "" : "s"} placed in a classroom`,
   },
 ];
 

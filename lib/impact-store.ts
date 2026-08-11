@@ -1,7 +1,8 @@
 import { useSyncExternalStore } from "react";
-import { cadToMeals } from "./impact";
 
-const STORAGE_KEY = "givenow:impact-meter:v1";
+// v2: stores a raw CAD total (previously a converted "meals" unit) — bumped
+// so old sessions don't reinterpret a meals figure as a dollar amount.
+const STORAGE_KEY = "givenow:impact-total-cad:v2";
 
 let total = 0;
 let initialized = false;
@@ -17,6 +18,15 @@ function ensureInitialized() {
   } catch {
     // localStorage unavailable (private mode, etc.) — keep in-memory total.
   }
+}
+
+function persist() {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, String(total));
+  } catch {
+    // ignore write failures, total still updates for this session
+  }
+  listeners.forEach((listener) => listener());
 }
 
 function subscribe(listener: () => void) {
@@ -36,17 +46,18 @@ function getServerSnapshot() {
 
 export function addContribution(amountCad: number) {
   ensureInitialized();
-  total += cadToMeals(amountCad);
-  try {
-    window.localStorage.setItem(STORAGE_KEY, String(total));
-  } catch {
-    // ignore write failures, meter still updates for this session
-  }
-  listeners.forEach((listener) => listener());
+  total += amountCad;
+  persist();
 }
 
-/** Total impact (in the universal "meals" unit) shared across Home and Tap & Feed. */
+export function resetImpact() {
+  ensureInitialized();
+  total = 0;
+  persist();
+}
+
+/** Total CAD donated, shared across Home, Tap & Feed, and Settings. */
 export function useImpact() {
-  const totalMeals = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  return { totalMeals, addContribution };
+  const totalDonatedCad = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return { totalDonatedCad, addContribution, resetImpact };
 }

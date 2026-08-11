@@ -2,17 +2,23 @@
 
 import { CheckCircle2 } from "lucide-react";
 import type { Charity } from "@/lib/types";
-import { formatMeals, UNIVERSAL_UNIT_LABEL } from "@/lib/impact";
+import { formatCad } from "@/lib/impact";
 
 interface Props {
   charity: Charity;
   units: number;
   amountCad: number;
-  totalMeals: number;
+  totalDonatedCad: number;
   onClose: () => void;
 }
 
-export default function ImpactRevealSheet({ charity, units, amountCad, totalMeals, onClose }: Props) {
+export default function ImpactRevealSheet({
+  charity,
+  units,
+  amountCad,
+  totalDonatedCad,
+  onClose,
+}: Props) {
   const impact = charity.describeImpact(units);
 
   return (
@@ -31,7 +37,7 @@ export default function ImpactRevealSheet({ charity, units, amountCad, totalMeal
           Donation sent
         </p>
         <h2 className="mt-1.5 text-center text-2xl font-extrabold leading-snug text-clay">
-          ${amountCad.toFixed(2)} CAD ={" "}
+          {formatCad(amountCad)} CAD ={" "}
           <span style={{ color: charity.accent }}>{impact}</span>
         </h2>
         <p className="mt-2 text-center text-[13px] text-clay/55">
@@ -43,7 +49,7 @@ export default function ImpactRevealSheet({ charity, units, amountCad, totalMeal
             Your running impact
           </p>
           <p className="mt-0.5 text-lg font-extrabold text-clay">
-            {formatMeals(totalMeals)} {UNIVERSAL_UNIT_LABEL} provided so far
+            {formatCad(totalDonatedCad)} donated so far
           </p>
         </div>
 
