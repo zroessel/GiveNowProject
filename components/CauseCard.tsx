@@ -6,12 +6,8 @@ export default function CauseCard({ charity }: { charity: Charity }) {
 
   if (charity.photo) {
     return (
-      <div
-        key={charity.id}
-        className="animate-pop-in relative w-full overflow-hidden rounded-3xl shadow-sm"
-        style={{ backgroundColor: charity.tint }}
-      >
-        <div className="relative h-32 w-full">
+      <div key={charity.id} className="animate-pop-in relative w-full">
+        <div className="relative h-40 w-full">
           <Image
             src={charity.photo}
             alt=""
