@@ -14,8 +14,8 @@ export default function ImpactRevealSheet({ charity, amountCad, totalMeals, onCl
   const impact = getImpactStatement(charity, amountCad);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-clay/40 backdrop-blur-[2px]">
-      <div className="animate-pop-in w-full max-w-md rounded-t-[2rem] bg-cream px-6 pb-[calc(2rem+env(safe-area-inset-bottom))] pt-7 shadow-2xl">
+    <div className="absolute inset-0 z-50 flex items-end justify-center bg-clay/40 backdrop-blur-[2px]">
+      <div className="animate-pop-in w-full rounded-t-[2rem] bg-cream px-6 pb-[calc(2rem+env(safe-area-inset-bottom))] pt-7 shadow-2xl">
         <div className="mx-auto mb-5 h-1.5 w-10 rounded-full bg-clay/15" />
 
         <div

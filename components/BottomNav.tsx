@@ -13,7 +13,7 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-40 border-t border-clay/10 bg-cream/90 backdrop-blur-md"
+      className="absolute bottom-0 inset-x-0 z-40 border-t border-clay/10 bg-cream/90 backdrop-blur-md"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <div className="mx-auto flex max-w-md items-stretch justify-around">

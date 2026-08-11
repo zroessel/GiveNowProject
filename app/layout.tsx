@@ -26,11 +26,16 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${nunito.variable} h-dvh antialiased`}>
-      <body className="flex h-dvh flex-col overflow-hidden bg-cream text-clay">
-        <div className="flex min-h-0 flex-1 flex-col pb-[calc(4.25rem+env(safe-area-inset-bottom))]">
-          {children}
+      <body className="h-dvh overflow-hidden bg-[#EDE3D5] text-clay sm:flex sm:items-center sm:justify-center sm:p-6">
+        {/* On phones this is edge-to-edge, matching the real app. From `sm` up it becomes
+            a phone-shaped frame centered on the page — the app is designed mobile-first
+            and should still *read* as mobile on a laptop, not stretch full-bleed. */}
+        <div className="relative mx-auto flex h-dvh w-full flex-col overflow-hidden bg-cream sm:h-[min(860px,100dvh-3rem)] sm:max-w-[420px] sm:rounded-[2.75rem] sm:shadow-2xl sm:ring-1 sm:ring-clay/10">
+          <div className="flex min-h-0 flex-1 flex-col pb-[calc(4.25rem+env(safe-area-inset-bottom))]">
+            {children}
+          </div>
+          <BottomNav />
         </div>
-        <BottomNav />
       </body>
     </html>
   );
