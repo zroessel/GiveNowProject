@@ -3,7 +3,6 @@ import type { Charity } from "./types";
 /** Stepper bounds for the Home donate flow, in whole units of impact (e.g. meals). */
 export const MIN_UNITS = 1;
 export const MAX_UNITS = 30;
-export const DEFAULT_UNITS = 5;
 
 /** Simulated sponsor-funded micro-donation per animal tap, in CAD. */
 export const TAP_DONATION_AMOUNT_CAD = 0.5;

@@ -6,7 +6,7 @@ export default function CauseCard({ charity }: { charity: Charity }) {
 
   if (charity.photo) {
     return (
-      <div key={charity.id} className="animate-pop-in relative w-full">
+      <div key={charity.id} className="animate-pop-in relative -mx-5 w-[calc(100%+2.5rem)]">
         <div className="relative h-40 w-full">
           <Image
             src={charity.photo}

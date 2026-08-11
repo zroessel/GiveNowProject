@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronDown, Minus, Plus } from "lucide-react";
 import { charities, getCharityById } from "@/lib/charities";
-import { DEFAULT_UNITS, MAX_UNITS, MIN_UNITS, clampUnits, unitsToAmountCad } from "@/lib/impact";
+import { MAX_UNITS, MIN_UNITS, clampUnits, unitsToAmountCad } from "@/lib/impact";
 import { useImpact } from "@/lib/impact-store";
 import CauseCard from "@/components/CauseCard";
 import ImpactMeter from "@/components/ImpactMeter";
@@ -23,7 +23,7 @@ export default function HomeScreen() {
   const { totalDonatedCad, addContribution } = useImpact();
 
   const [charityId, setCharityId] = useState(charities[0].id);
-  const [units, setUnits] = useState(DEFAULT_UNITS);
+  const [units, setUnits] = useState(MIN_UNITS);
   const [donating, setDonating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reveal, setReveal] = useState<RevealState | null>(null);
