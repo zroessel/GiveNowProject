@@ -7,16 +7,19 @@ curated cause, tap one big button, and instantly see exactly what your donation 
 then watch a running impact meter grow across everything you do in the app.
 
 This is a portfolio/demo project. All charities, sponsors, and impact numbers are
-fictional. Payments run through [Stripe in test mode](https://stripe.com/docs/testing)
-only — no real money ever moves.
+fictional, and no real money ever moves — by default the donate flow is fully
+simulated. A real [Stripe test-mode](https://stripe.com/docs/testing) Checkout
+integration is built in and ready to go (see below) if you want to demo the actual
+payment flow; wiring up live payments is a deliberate future step, not part of this
+concept.
 
 ## How it works
 
 - **Give (Home)** — one curated "cause of the day," one description, one Donate button.
-  Tapping Donate kicks off a real Stripe Checkout session (test mode) for a fixed $5 CAD.
-  On success you immediately see a specific impact statement pulled from that charity's
+  Tapping Donate instantly shows a specific impact statement pulled from that charity's
   cost-per-outcome data (e.g. *"$5 CAD = 2 hot meals delivered this week"*), not a
-  generic thank-you.
+  generic thank-you. If Stripe test keys are configured (see below), it routes through a
+  real Stripe Checkout session first.
 - **Tap & Feed** — a small tap-to-feed mini-game. Tapping an animal simulates a
   sponsor-funded micro-donation with a little bounce/sparkle animation. No losing, no
   timer, just a satisfying loop.
@@ -28,35 +31,35 @@ only — no real money ever moves.
 
 - Next.js (App Router) + TypeScript + React
 - Tailwind CSS v4
-- Stripe Checkout (test mode) for the donate flow
+- Stripe Checkout (test mode, optional) for the donate flow
 - No backend/database — local component state + `localStorage` for the impact meter
 
 ## Getting started
 
 ```bash
 npm install
-cp .env.local.example .env.local
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000). No configuration needed — the
+Donate button runs a simulated instant success out of the box.
 
-### Stripe test mode setup
+### Optional: enable real Stripe test-mode checkout
 
-The donate flow calls a real Stripe Checkout Session. To exercise it end to end:
+To demo the actual Stripe Checkout page instead of the simulated flow:
 
 1. Grab **test mode** keys from the [Stripe dashboard](https://dashboard.stripe.com/test/apikeys).
-2. Fill in `.env.local`:
+2. `cp .env.local.example .env.local` and fill in:
    ```
    STRIPE_SECRET_KEY=sk_test_...
    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
    ```
-3. On the Stripe Checkout page, pay with a [test card](https://stripe.com/docs/testing#cards)
-   such as `4242 4242 4242 4242`, any future expiry, any CVC.
+3. Restart `npm run dev`. On the Stripe Checkout page, pay with a
+   [test card](https://stripe.com/docs/testing#cards) such as `4242 4242 4242 4242`,
+   any future expiry, any CVC.
 
-If `STRIPE_SECRET_KEY` isn't set, the Donate button falls back to a simulated instant
-success (clearly a demo shortcut, not a substitute) so the app is still runnable with
-zero configuration.
+Without these keys, the Donate button falls back to the simulated instant success —
+this is the default, intended experience for this concept, not a broken state.
 
 ## Project structure
 
@@ -86,11 +89,17 @@ lib/
 
 1. Push this repo to GitHub.
 2. Import it in [Vercel](https://vercel.com/new).
-3. Add the same environment variables from `.env.local` in the Vercel project settings
-   (`STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`).
+3. (Optional) Add `STRIPE_SECRET_KEY` and `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` in the
+   Vercel project settings if you want the deployed demo to use real Stripe test-mode
+   checkout instead of the simulated flow.
 4. Deploy — no other configuration needed.
 
 ## Out of scope (v1)
 
 Real payment processing beyond Stripe test mode, user accounts/auth, a database, real
 charity or sponsor integrations, and native mobile builds. This is a responsive web app.
+
+## Possible future direction
+
+Wiring the deployed demo up to real Stripe test-mode checkout by default (it's already
+built and just needs keys — see above).

@@ -136,7 +136,7 @@ export default function HomeScreen() {
           {donating ? "Sending your gift…" : `Donate $${DONATION_AMOUNT_CAD} CAD`}
         </button>
         <p className="text-[11px] font-medium text-clay/35">
-          Stripe test mode · no real charge
+          Concept demo · no real charge
         </p>
       </footer>
 
