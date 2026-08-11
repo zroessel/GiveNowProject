@@ -30,7 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {/* On phones this is edge-to-edge, matching the real app. From `sm` up it becomes
             a phone-shaped frame centered on the page — the app is designed mobile-first
             and should still *read* as mobile on a laptop, not stretch full-bleed. */}
-        <div className="relative mx-auto flex h-dvh w-full flex-col overflow-hidden bg-cream sm:h-[min(860px,100dvh-3rem)] sm:max-w-[420px] sm:rounded-[2.75rem] sm:shadow-2xl sm:ring-1 sm:ring-clay/10">
+        <div className="relative mx-auto flex h-dvh w-full flex-col overflow-hidden bg-cream sm:h-[min(852px,100dvh-3rem)] sm:w-auto sm:aspect-[393/852] sm:max-w-[92vw] sm:rounded-[2.75rem] sm:shadow-2xl sm:ring-1 sm:ring-clay/10">
           <div className="flex min-h-0 flex-1 flex-col pb-[calc(4.25rem+env(safe-area-inset-bottom))]">
             {children}
           </div>
