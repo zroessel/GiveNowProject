@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fff8f0;
+  --foreground: #3a2a21;
+
+  /* Warm, human, optimistic — not corporate blue, not SaaS dark mode. */
+  --color-cream: #fff8f0;
+  --color-cream-deep: #fbeee0;
+  --color-clay: #3a2a21;
+  --color-terracotta: #e2703a;
+  --color-terracotta-deep: #c85a29;
+  --color-gold: #f2b84b;
+  --color-blush: #fbeae0;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-cream: var(--color-cream);
+  --color-cream-deep: var(--color-cream-deep);
+  --color-clay: var(--color-clay);
+  --color-terracotta: var(--color-terracotta);
+  --color-terracotta-deep: var(--color-terracotta-deep);
+  --color-gold: var(--color-gold);
+  --color-blush: var(--color-blush);
+  --font-sans: var(--font-nunito);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  overscroll-behavior-y: none;
+}
+
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes bounce-tap {
+  0% {
+    transform: scale(1) translateY(0);
+  }
+  30% {
+    transform: scale(1.15) translateY(-10px) rotate(-4deg);
+  }
+  55% {
+    transform: scale(0.95) translateY(2px) rotate(3deg);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes sparkle-rise {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-46px) scale(1.1);
+  }
+}
+
+@keyframes meter-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.animate-pop-in {
+  animation: pop-in 0.35s cubic-bezier(0.2, 0.8, 0.3, 1.1) both;
+}
+
+.animate-bounce-tap {
+  animation: bounce-tap 0.55s cubic-bezier(0.3, 0.6, 0.3, 1) both;
+}
+
+.animate-sparkle-rise {
+  animation: sparkle-rise 0.7s ease-out both;
+}
+
+.animate-meter-pulse {
+  animation: meter-pulse 0.4s ease-out both;
+}
