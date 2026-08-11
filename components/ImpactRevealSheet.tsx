@@ -1,5 +1,6 @@
 "use client";
 
+import { CheckCircle2 } from "lucide-react";
 import type { Charity } from "@/lib/types";
 import { formatMeals, UNIVERSAL_UNIT_LABEL } from "@/lib/impact";
 
@@ -20,10 +21,10 @@ export default function ImpactRevealSheet({ charity, units, amountCad, totalMeal
         <div className="mx-auto mb-5 h-1.5 w-10 rounded-full bg-clay/15" />
 
         <div
-          className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full text-3xl"
+          className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full"
           style={{ backgroundColor: charity.tint }}
         >
-          <span aria-hidden>✅</span>
+          <CheckCircle2 size={32} strokeWidth={2} style={{ color: charity.accent }} aria-hidden />
         </div>
 
         <p className="text-center text-sm font-bold uppercase tracking-wide text-terracotta-deep">
