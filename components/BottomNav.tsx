@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Heart, PawPrint, Settings } from "lucide-react";
+import { Boxes, Heart, Settings } from "lucide-react";
 
 const TABS = [
   { href: "/", label: "Give", icon: Heart },
-  { href: "/tap-and-feed", label: "Tap & Feed", icon: PawPrint },
+  { href: "/map", label: "Map", icon: Boxes },
   { href: "/settings", label: "Settings", icon: Settings },
 ] as const;
 

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronRight, RotateCcw } from "lucide-react";
 import { useAccount } from "@/lib/account-store";
 import { useCards } from "@/lib/cards-store";
+import { useDonationsByCharity } from "@/lib/donations-store";
 import { useImpact } from "@/lib/impact-store";
 import { formatCad } from "@/lib/impact";
 import AppHeader from "@/components/AppHeader";
@@ -13,6 +14,7 @@ export default function SettingsPage() {
   const { account } = useAccount();
   const { cards } = useCards();
   const { totalDonatedCad, resetImpact } = useImpact();
+  const { resetDonations } = useDonationsByCharity();
   const [confirmingReset, setConfirmingReset] = useState(false);
 
   const defaultCard = cards.find((c) => c.isDefault) ?? cards[0];
@@ -24,6 +26,7 @@ export default function SettingsPage() {
       return;
     }
     resetImpact();
+    resetDonations();
     setConfirmingReset(false);
   };
 

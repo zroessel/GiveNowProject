@@ -4,9 +4,6 @@ import type { Charity } from "./types";
 export const MIN_UNITS = 1;
 export const MAX_UNITS = 30;
 
-/** Simulated sponsor-funded micro-donation per animal tap, in CAD. */
-export const TAP_DONATION_AMOUNT_CAD = 0.5;
-
 /**
  * Stripe won't process a charge below this amount. The stepper itself can go
  * as low as one unit (e.g. $0.20), but if that's ever below what a real

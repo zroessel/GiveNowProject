@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronDown, Minus, Plus } from "lucide-react";
 import { charities, getCharityById } from "@/lib/charities";
+import { useDonationsByCharity } from "@/lib/donations-store";
 import { MAX_UNITS, MIN_UNITS, clampUnits, unitsToAmountCad } from "@/lib/impact";
 import { useImpact } from "@/lib/impact-store";
 import AppHeader from "@/components/AppHeader";
@@ -20,6 +21,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { totalDonatedCad, addContribution } = useImpact();
+  const { addCharityUnits } = useDonationsByCharity();
 
   const [charityId, setCharityId] = useState(charities[0].id);
   const [units, setUnits] = useState(MIN_UNITS);
@@ -58,6 +60,7 @@ export default function HomeScreen() {
       if (data.simulated) {
         await new Promise((r) => setTimeout(r, 450));
         addContribution(amountCad);
+        addCharityUnits(charity.id, units);
         setReveal({ charityId: charity.id, units, amountCad });
         setDonating(false);
         return;
@@ -68,7 +71,7 @@ export default function HomeScreen() {
       setError("Couldn't start checkout. Please try again.");
       setDonating(false);
     }
-  }, [charity.id, units, amountCad, addContribution]);
+  }, [charity.id, units, amountCad, addContribution, addCharityUnits]);
 
   // Handle the redirect back from Stripe Checkout.
   useEffect(() => {
@@ -93,6 +96,7 @@ export default function HomeScreen() {
           if (data.paid && data.causeId && data.units && data.amountCad) {
             const paidCharity = getCharityById(data.causeId);
             addContribution(data.amountCad);
+            addCharityUnits(paidCharity.id, data.units);
             setReveal({ charityId: paidCharity.id, units: data.units, amountCad: data.amountCad });
           } else {
             setError("Payment wasn't completed.");

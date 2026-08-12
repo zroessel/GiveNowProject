@@ -2,37 +2,44 @@
 
 A concept donation app built around one idea: **donating should be one button away.**
 
-No account creation, no scrolling through charity lists, no friction. You see a single
-curated cause, tap one big button, and instantly see exactly what your donation did —
-then watch a running impact meter grow across everything you do in the app.
+No account creation, no scrolling through charity lists, no friction. Pick a cause,
+dial in an amount with a simple stepper, tap Donate, and instantly see a concrete
+impact statement — not a generic thank-you. A running dollar total and a 3D map of
+what you've physically funded (shelters, meals, water, trees, textbooks) tie it all
+together.
 
-This is a portfolio/demo project. All charities, sponsors, and impact numbers are
-fictional, and no real money ever moves — by default the donate flow is fully
-simulated. A real [Stripe test-mode](https://stripe.com/docs/testing) Checkout
-integration is built in and ready to go (see below) if you want to demo the actual
-payment flow; wiring up live payments is a deliberate future step, not part of this
-concept.
+This is a portfolio/demo project. All charities and impact numbers are fictional, and
+no real money ever moves — by default the donate flow is fully simulated. A real
+[Stripe test-mode](https://stripe.com/docs/testing) Checkout integration is built in
+and ready to go (see below) if you want to demo the actual payment flow.
 
 ## How it works
 
-- **Give (Home)** — one curated "cause of the day," one description, one Donate button.
-  Tapping Donate instantly shows a specific impact statement pulled from that charity's
-  cost-per-outcome data (e.g. *"$5 CAD = 2 hot meals delivered this week"*), not a
-  generic thank-you. If Stripe test keys are configured (see below), it routes through a
-  real Stripe Checkout session first.
-- **Tap & Feed** — a small tap-to-feed mini-game. Tapping an animal simulates a
-  sponsor-funded micro-donation with a little bounce/sparkle animation. No losing, no
-  timer, just a satisfying loop.
-- **Impact meter** — every cause reports its own unit (litres, books, vaccines...), so to
-  keep one running total the app converts every dollar donated — from either screen —
-  into a shared universal unit ("meals provided") and persists it in `localStorage`.
+- **Give (Home)** — a charity banner fills the screen behind a floating header, with a
+  price + unit-count stepper (`-`/`+`) and a change-charity dropdown underneath. Each
+  charity has its own real-world-plausible cost per unit (e.g. $0.20/meal, $3.00/night
+  of shelter). Tapping Donate instantly shows a specific impact statement (e.g. *"$3.00
+  CAD = 15 hot meals delivered"*). If Stripe test keys are configured (see below), it
+  routes through a real Stripe Checkout session first — the server always recomputes
+  the charge amount itself from the charity + unit count, never trusting a client-sent
+  dollar figure.
+- **Map** — a 3D scene (React Three Fiber / Three.js) you can drag to rotate and pinch
+  to zoom, showing a stylized, low-poly physical representation of everything you've
+  funded: little houses for nights of shelter, bowls for meals, bottles for litres of
+  water, trees for reforestation, book stacks for textbooks — one model per unit funded,
+  up to 12 per cause.
+- **Settings** — a mock Account (editable display name) and Payment page (add/remove
+  demo cards — brand, last 4 digits, and expiry only; never a full card number), both
+  local and `localStorage`-backed. There's no real sign-in system behind either.
 
 ## Tech stack
 
 - Next.js (App Router) + TypeScript + React
 - Tailwind CSS v4
+- React Three Fiber + Three.js + drei for the 3D impact map
 - Stripe Checkout (test mode, optional) for the donate flow
-- No backend/database — local component state + `localStorage` for the impact meter
+- No backend/database — local component state + `localStorage` for everything that
+  persists (impact totals, per-charity breakdown, account, cards)
 
 ## Getting started
 
@@ -65,24 +72,30 @@ this is the default, intended experience for this concept, not a broken state.
 
 ```
 app/
-  page.tsx                  Home route (renders HomeScreen)
-  tap-and-feed/page.tsx     Tap & Feed route
-  api/checkout/route.ts     Creates a Stripe Checkout Session
-  api/checkout/verify/      Confirms a session after redirect back
-  layout.tsx, globals.css   Shell, fonts, warm color theme
+  page.tsx                    Home route (renders HomeScreen)
+  map/page.tsx                 3D impact map
+  settings/page.tsx            Settings list
+  settings/account/page.tsx    Mock editable profile
+  settings/payment/page.tsx    Mock cards on file
+  api/checkout/route.ts        Creates a Stripe Checkout Session
+  api/checkout/verify/         Confirms a session after redirect back
+  layout.tsx, globals.css      Shell, fonts, warm color theme, phone frame on desktop
 components/
-  HomeScreen.tsx            Donate flow: cause card, donate button, reveal sheet
-  CauseCard.tsx              Cause of the day display
-  ImpactRevealSheet.tsx      Post-donation impact statement
-  AnimalTile.tsx             Tap & Feed animal + animation
-  ImpactMeter.tsx            Shared running total, shown on both screens
-  BottomNav.tsx               Give / Tap & Feed tab bar
+  HomeScreen.tsx                Donate flow: banner, stepper, dropdown, reveal sheet
+  CauseCard.tsx                 Full-height hero banner (photo or icon) behind the header
+  AppHeader.tsx                 Shared floating header bar (Give / Map / Settings)
+  ImpactRevealSheet.tsx         Post-donation impact statement
+  ImpactScene3D.tsx              The 3D map itself (client-only, dynamically imported)
+  ImpactMeter.tsx                Running dollar total, shown in the header
+  BottomNav.tsx                  Give / Map / Settings tab bar
 lib/
-  charities.ts               Mock charity data + cause-of-the-day rotation
-  animals.ts                  Tap & Feed animal data
-  impact.ts                   Universal-unit conversion + impact statement logic
-  impact-store.ts             Shared impact meter (localStorage-backed)
-  stripe.ts                   Server-side Stripe client
+  charities.ts                  Mock charity data (name, cost/unit, icon, photo)
+  impact.ts                     Stepper bounds + amount/unit conversion helpers
+  impact-store.ts               Running CAD total (localStorage-backed)
+  donations-store.ts            Units funded per charity, feeds the 3D map
+  account-store.ts              Mock editable display name
+  cards-store.ts                Mock cards on file
+  stripe.ts                     Server-side Stripe client
 ```
 
 ## Deploying to Vercel
@@ -96,8 +109,9 @@ lib/
 
 ## Out of scope (v1)
 
-Real payment processing beyond Stripe test mode, user accounts/auth, a database, real
-charity or sponsor integrations, and native mobile builds. This is a responsive web app.
+Real payment processing beyond Stripe test mode, a real account/auth system, a
+database, real charity or sponsor integrations, and native mobile builds. This is a
+responsive web app.
 
 ## Possible future direction
 
