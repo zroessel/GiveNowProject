@@ -6,10 +6,9 @@ import { ChevronDown, Minus, Plus } from "lucide-react";
 import { charities, getCharityById } from "@/lib/charities";
 import { MAX_UNITS, MIN_UNITS, clampUnits, unitsToAmountCad } from "@/lib/impact";
 import { useImpact } from "@/lib/impact-store";
-import CauseCard from "@/components/CauseCard";
-import ImpactMeter from "@/components/ImpactMeter";
+import AppHeader from "@/components/AppHeader";
+import CauseCard, { HERO_HEIGHT_CLASS } from "@/components/CauseCard";
 import ImpactRevealSheet from "@/components/ImpactRevealSheet";
-import Logo from "@/components/Logo";
 
 interface RevealState {
   charityId: string;
@@ -113,19 +112,13 @@ export default function HomeScreen() {
 
   return (
     <div className="relative flex h-full flex-1 flex-col">
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-72 -z-10 transition-colors duration-500"
-        style={{ backgroundImage: `linear-gradient(to bottom, ${charity.tint}, transparent)` }}
-      />
-
-      <header className="flex items-center justify-between px-5 pt-[calc(0.75rem+env(safe-area-inset-top))]">
-        <Logo />
-        <ImpactMeter />
-      </header>
+      <CauseCard charity={charity} />
+      <div className="absolute inset-x-0 top-0 z-10">
+        <AppHeader />
+      </div>
+      <div className={`${HERO_HEIGHT_CLASS} shrink-0`} aria-hidden />
 
       <main className="flex flex-1 flex-col items-center justify-center gap-7 px-5">
-        <CauseCard charity={charity} />
-
         <div className="flex items-center justify-center gap-5">
           <button
             onClick={handleDecrement}
@@ -181,7 +174,7 @@ export default function HomeScreen() {
         </div>
       </main>
 
-      <footer className="flex flex-col items-center gap-2.5 px-6 pb-6">
+      <footer className="flex flex-col items-center gap-2.5 border-t border-clay/8 bg-white/50 px-6 pb-6 pt-4 backdrop-blur-sm">
         {error && <p className="text-[13px] font-semibold text-terracotta-deep">{error}</p>}
         <button
           onClick={handleDonate}

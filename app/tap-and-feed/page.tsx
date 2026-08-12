@@ -4,8 +4,7 @@ import { animals } from "@/lib/animals";
 import { TAP_DONATION_AMOUNT_CAD } from "@/lib/impact";
 import { useImpact } from "@/lib/impact-store";
 import AnimalTile from "@/components/AnimalTile";
-import ImpactMeter from "@/components/ImpactMeter";
-import Logo from "@/components/Logo";
+import AppHeader from "@/components/AppHeader";
 
 export default function TapAndFeedPage() {
   const { addContribution } = useImpact();
@@ -17,10 +16,7 @@ export default function TapAndFeedPage() {
         style={{ backgroundImage: "linear-gradient(to bottom, #EAF1E3, transparent)" }}
       />
 
-      <header className="flex items-center justify-between px-5 pt-[calc(0.75rem+env(safe-area-inset-top))]">
-        <Logo />
-        <ImpactMeter />
-      </header>
+      <AppHeader />
 
       <main className="flex flex-1 flex-col items-center justify-center gap-7 px-6">
         <div className="max-w-xs text-center">
