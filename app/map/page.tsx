@@ -25,7 +25,22 @@ export default function MapPage() {
       </div>
 
       <div className="flex flex-1 flex-col pt-[calc(4.5rem+env(safe-area-inset-top))]">
-        {!hasAnyDonations && (
+        {hasAnyDonations ? (
+          <div className="flex flex-wrap items-center justify-center gap-x-3.5 gap-y-1 px-6 pb-2">
+            {charities.map((charity) => {
+              const Icon = charity.icon;
+              return (
+                <span
+                  key={charity.id}
+                  className="inline-flex items-center gap-1 text-[12px] font-bold text-clay/55"
+                >
+                  <Icon size={13} strokeWidth={2.25} style={{ color: charity.accent }} aria-hidden />
+                  {unitsByCharity[charity.id] ?? 0}
+                </span>
+              );
+            })}
+          </div>
+        ) : (
           <p className="px-6 pb-2 text-center text-[12px] font-medium text-clay/45">
             Drag to look around — donate on Give to start building the town.
           </p>
