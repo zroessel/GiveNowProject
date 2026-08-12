@@ -9,17 +9,46 @@ import type { Charity } from "@/lib/types";
 const MAX_VISIBLE = 12;
 const MODEL_BASE = "/models/town/";
 
-// Sunflower-seed spiral: even, non-overlapping placement that grows outward
-// as more buildings are added, instead of grouping by type.
-const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
-const SPIRAL_SPACING = 1.55;
-const SPIRAL_START = 3; // keeps the first few slots clear of the center fountain
+// Two streets meeting at the town square: a main street running out along
+// +X, and a cross street along +Z once the main street fills up. Both wind
+// gently rather than running dead straight. Buildings line both sides,
+// facing the road, and the road itself grows as more get added.
+const ROAD_SPACING = 2.3;
+const ROAD_AMPLITUDE = 1.5;
+const ROAD_FREQUENCY = 0.3;
+const ROAD_SETBACK = 1.4;
+const MAIN_STREET_SLOTS = 12;
 
-function spiralPosition(index: number): readonly [number, number] {
-  const i = index + SPIRAL_START;
-  const r = SPIRAL_SPACING * Math.sqrt(i);
-  const theta = i * GOLDEN_ANGLE;
-  return [Math.cos(theta) * r, Math.sin(theta) * r];
+type RoadAxis = "main" | "cross";
+
+function roadCenter(axis: RoadAxis, t: number): readonly [number, number] {
+  const along = t * ROAD_SPACING;
+  const wave = Math.sin(t * ROAD_FREQUENCY) * ROAD_AMPLITUDE;
+  return axis === "main" ? [along, wave] : [wave, along];
+}
+
+function roadTangentAngle(axis: RoadAxis, t: number): number {
+  const [x0, z0] = roadCenter(axis, t - 0.02);
+  const [x1, z1] = roadCenter(axis, t + 0.02);
+  return Math.atan2(z1 - z0, x1 - x0);
+}
+
+/** Where the i-th building along the street network sits, and which way it should face. */
+function streetSlot(index: number): { position: readonly [number, number]; facing: number } {
+  const axis: RoadAxis = index < MAIN_STREET_SLOTS ? "main" : "cross";
+  const localIndex = index < MAIN_STREET_SLOTS ? index : index - MAIN_STREET_SLOTS;
+  const side = localIndex % 2 === 0 ? 1 : -1;
+  const t = Math.floor(localIndex / 2) + 1;
+
+  const [cx, cz] = roadCenter(axis, t);
+  const tangent = roadTangentAngle(axis, t);
+  const perpendicular = tangent + Math.PI / 2;
+
+  const bx = cx + Math.cos(perpendicular) * ROAD_SETBACK * side;
+  const bz = cz + Math.sin(perpendicular) * ROAD_SETBACK * side;
+  const facing = perpendicular + (side > 0 ? Math.PI : 0);
+
+  return { position: [bx, bz], facing };
 }
 
 const MODEL_FILES = [
@@ -157,18 +186,24 @@ function buildPlacementOrder(charities: Charity[], unitsByCharity: Record<string
   return order;
 }
 
-function SpiralPath({ count }: { count: number }) {
-  const steps = Math.max(count * 2, 8);
-  const tiles = useMemo(
-    () => Array.from({ length: steps }, (_, i) => spiralPosition(i / 2 - SPIRAL_START * 0.5)),
-    [steps],
-  );
+/** A paved strip of tiles following one road's centerline out to `lengthT`. */
+function RoadStrip({ axis, lengthT }: { axis: RoadAxis; lengthT: number }) {
+  const tiles = useMemo(() => {
+    const stepsPerUnit = 1.8;
+    const count = Math.max(Math.ceil(lengthT * stepsPerUnit), 2);
+    return Array.from({ length: count + 1 }, (_, i) => {
+      const t = (i / count) * lengthT;
+      const [x, z] = roadCenter(axis, t);
+      const angle = roadTangentAngle(axis, t);
+      return { x, z, angle };
+    });
+  }, [axis, lengthT]);
 
   return (
     <>
-      {tiles.map(([x, z], i) => (
-        <mesh key={i} position={[x, 0.021, z]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-          <circleGeometry args={[0.26, 8]} />
+      {tiles.map(({ x, z, angle }, i) => (
+        <mesh key={i} position={[x, 0.021, z]} rotation={[-Math.PI / 2, 0, angle]} receiveShadow>
+          <planeGeometry args={[1.7, 1.15]} />
           <meshStandardMaterial color="#C9B08A" />
         </mesh>
       ))}
@@ -179,11 +214,14 @@ function SpiralPath({ count }: { count: number }) {
 /** A large low-poly terrain: flat near the town, gently faceted further out. */
 function Landscape() {
   const geometry = useMemo(() => {
-    const size = 90;
-    const segments = 32;
+    // Sized to comfortably cover the cross street's worst case (all five
+    // charities maxed out at 12 buildings each spills ~48 onto the cross
+    // street, reaching roughly 55 units out).
+    const size = 160;
+    const segments = 40;
     const geo = new PlaneGeometry(size, size, segments, segments);
     const pos = geo.attributes.position;
-    const townRadius = 14;
+    const townRadius = 16;
     const outerRadius = size / 2;
 
     for (let i = 0; i < pos.count; i++) {
@@ -211,16 +249,22 @@ function Town({ charities, unitsByCharity }: { charities: Charity[]; unitsByChar
   const placements = useMemo(() => buildPlacementOrder(charities, unitsByCharity), [charities, unitsByCharity]);
   const centerFountain = models.fountains[0];
 
+  const mainSlotsUsed = Math.min(placements.length, MAIN_STREET_SLOTS);
+  const crossSlotsUsed = Math.max(placements.length - MAIN_STREET_SLOTS, 0);
+  const mainLengthT = mainSlotsUsed > 0 ? Math.ceil(mainSlotsUsed / 2) + 0.5 : 0;
+  const crossLengthT = crossSlotsUsed > 0 ? Math.ceil(crossSlotsUsed / 2) + 0.5 : 0;
+
   return (
     <>
       <Landscape />
-      <SpiralPath count={placements.length} />
+      {mainLengthT > 0 && <RoadStrip axis="main" lengthT={mainLengthT} />}
+      {crossLengthT > 0 && <RoadStrip axis="cross" lengthT={crossLengthT} />}
       <Clone object={centerFountain} scale={0.7} position={[0, 0.02, 0]} />
 
       {placements.map((p, i) => {
-        const [x, z] = spiralPosition(i);
+        const { position, facing } = streetSlot(i);
+        const [x, z] = position;
         const Building = BUILDINGS[p.charity.id] ?? FoodStand;
-        const facing = Math.atan2(z, x);
         return (
           <group key={`${p.charity.id}-${p.seed}`} position={[x, 0, z]} rotation={[0, facing, 0]}>
             <Building models={models} seed={p.seed} />

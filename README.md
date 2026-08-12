@@ -24,12 +24,15 @@ and ready to go (see below) if you want to demo the actual payment flow.
   the charge amount itself from the charity + unit count, never trusting a client-sent
   dollar figure.
 - **Map** — a 3D scene (React Three Fiber / Three.js) you can drag to rotate and pinch
-  to zoom: a little town that grows as you give. A house per night of shelter, a market
-  stall per meal, a well per litre of water, a tree per sapling, a school per textbook —
-  one building per unit funded, up to 12 per cause, each district connected to the town
-  center by a stone path. Built from a curated subset of Kenney's CC0-licensed
-  [Fantasy Town Kit](https://kenney.nl/assets/fantasy-town-kit) (`public/models/town/`)
-  rather than hand-rolled primitives.
+  to zoom: a little town that grows as you give, along two real streets meeting at a
+  central well. A house per night of shelter, a market stall per meal, a well per litre
+  of water, a tree per sapling, a school per textbook — one building per unit funded, up
+  to 12 per cause, interleaved so neighboring buildings are usually different types
+  rather than grouped by cause. Buildings line both sides of the main street first, then
+  spill onto a cross street once it fills up. The ground is a large low-poly terrain —
+  flat where the town sits, gently faceted further out. Built from a curated subset of
+  Kenney's CC0-licensed [Fantasy Town Kit](https://kenney.nl/assets/fantasy-town-kit)
+  (`public/models/town/`) rather than hand-rolled primitives.
 - **Settings** — a mock Account (editable display name) and Payment page (add/remove
   demo cards — brand, last 4 digits, and expiry only; never a full card number), both
   local and `localStorage`-backed. There's no real sign-in system behind either.
