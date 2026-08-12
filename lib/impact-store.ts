@@ -1,10 +1,18 @@
 import { useSyncExternalStore } from "react";
 
-// v2: stores a raw CAD total (previously a converted "meals" unit) — bumped
-// so old sessions don't reinterpret a meals figure as a dollar amount.
-const STORAGE_KEY = "givenow:impact-total-cad:v2";
+// v3: adds a per-charity breakdown alongside the CAD total, so the impact
+// page can show what was actually funded per cause. Bumped from v2 so old
+// sessions don't reinterpret a bare number as this shape.
+const STORAGE_KEY = "givenow:impact-total-cad:v3";
 
-let total = 0;
+interface ImpactSnapshot {
+  total: number;
+  byCharity: Record<string, number>;
+}
+
+const EMPTY_SNAPSHOT: ImpactSnapshot = { total: 0, byCharity: {} };
+
+let snapshot: ImpactSnapshot = { total: 0, byCharity: {} };
 let initialized = false;
 const listeners = new Set<() => void>();
 
@@ -13,8 +21,12 @@ function ensureInitialized() {
   initialized = true;
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    const parsed = stored ? Number(stored) : 0;
-    if (!Number.isNaN(parsed)) total = parsed;
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (parsed && typeof parsed.total === "number" && parsed.byCharity) {
+        snapshot = { total: parsed.total, byCharity: parsed.byCharity };
+      }
+    }
   } catch {
     // localStorage unavailable (private mode, etc.) — keep in-memory total.
   }
@@ -22,7 +34,7 @@ function ensureInitialized() {
 
 function persist() {
   try {
-    window.localStorage.setItem(STORAGE_KEY, String(total));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
   } catch {
     // ignore write failures, total still updates for this session
   }
@@ -37,21 +49,27 @@ function subscribe(listener: () => void) {
 
 function getSnapshot() {
   ensureInitialized();
-  return total;
+  return snapshot;
 }
 
 function getServerSnapshot() {
-  return 0;
+  return EMPTY_SNAPSHOT;
 }
 
-export function addContribution(amountCad: number) {
+export function addContribution(amountCad: number, charityId: string) {
   ensureInitialized();
-  total += amountCad;
+  snapshot = {
+    total: snapshot.total + amountCad,
+    byCharity: {
+      ...snapshot.byCharity,
+      [charityId]: (snapshot.byCharity[charityId] ?? 0) + amountCad,
+    },
+  };
   persist();
 }
 
-/** Total CAD donated, shared across Home, Tap & Feed, and Settings. */
+/** Running CAD total and per-charity breakdown, shared across Home, the impact page, and Settings. */
 export function useImpact() {
-  const totalDonatedCad = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  return { totalDonatedCad, addContribution };
+  const { total, byCharity } = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return { totalDonatedCad: total, contributionsByCharity: byCharity, addContribution };
 }

@@ -57,7 +57,7 @@ export default function HomeScreen() {
 
       if (data.simulated) {
         await new Promise((r) => setTimeout(r, 450));
-        addContribution(amountCad);
+        addContribution(amountCad, charity.id);
         setReveal({ charityId: charity.id, units, amountCad });
         setDonating(false);
         return;
@@ -92,7 +92,7 @@ export default function HomeScreen() {
           const data = await res.json();
           if (data.paid && data.causeId && data.units && data.amountCad) {
             const paidCharity = getCharityById(data.causeId);
-            addContribution(data.amountCad);
+            addContribution(data.amountCad, paidCharity.id);
             setReveal({ charityId: paidCharity.id, units: data.units, amountCad: data.amountCad });
           } else {
             setError("Payment wasn't completed.");
