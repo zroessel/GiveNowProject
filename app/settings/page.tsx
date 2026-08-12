@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { ChevronRight, RotateCcw } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useAccount } from "@/lib/account-store";
 import { useCards } from "@/lib/cards-store";
 import { useImpact } from "@/lib/impact-store";
@@ -12,20 +11,9 @@ import AppHeader from "@/components/AppHeader";
 export default function SettingsPage() {
   const { account } = useAccount();
   const { cards } = useCards();
-  const { totalDonatedCad, resetImpact } = useImpact();
-  const [confirmingReset, setConfirmingReset] = useState(false);
+  const { totalDonatedCad } = useImpact();
 
   const defaultCard = cards.find((c) => c.isDefault) ?? cards[0];
-
-  const handleResetClick = () => {
-    if (!confirmingReset) {
-      setConfirmingReset(true);
-      setTimeout(() => setConfirmingReset(false), 3000);
-      return;
-    }
-    resetImpact();
-    setConfirmingReset(false);
-  };
 
   return (
     <div className="relative flex h-full flex-1 flex-col overflow-y-auto">
@@ -73,22 +61,6 @@ export default function SettingsPage() {
           <span className="text-[14px] font-bold text-clay">Total donated</span>
           <span className="text-[14px] font-extrabold text-clay">{formatCad(totalDonatedCad)}</span>
         </div>
-        <button
-          onClick={handleResetClick}
-          className="flex items-center gap-3 border-b border-clay/8 py-3.5 text-left"
-        >
-          <RotateCcw
-            size={16}
-            strokeWidth={2.25}
-            className={confirmingReset ? "text-terracotta-deep" : "text-clay/40"}
-            aria-hidden
-          />
-          <span
-            className={`text-[14px] font-bold ${confirmingReset ? "text-terracotta-deep" : "text-clay"}`}
-          >
-            {confirmingReset ? "Tap again to confirm" : "Reset impact meter"}
-          </span>
-        </button>
       </main>
 
       <footer className="px-6 pb-6 pt-4">

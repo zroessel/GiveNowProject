@@ -50,14 +50,8 @@ export function addContribution(amountCad: number) {
   persist();
 }
 
-export function resetImpact() {
-  ensureInitialized();
-  total = 0;
-  persist();
-}
-
 /** Total CAD donated, shared across Home, Tap & Feed, and Settings. */
 export function useImpact() {
   const totalDonatedCad = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  return { totalDonatedCad, addContribution, resetImpact };
+  return { totalDonatedCad, addContribution };
 }
