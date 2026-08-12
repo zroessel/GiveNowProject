@@ -4,9 +4,9 @@ A concept donation app built around one idea: **donating should be one button aw
 
 No account creation, no scrolling through charity lists, no friction. Pick a cause,
 dial in an amount with a simple stepper, tap Donate, and instantly see a concrete
-impact statement — not a generic thank-you. A running dollar total and a 3D map of
-what you've physically funded (shelters, meals, water, trees, textbooks) tie it all
-together.
+impact statement — not a generic thank-you. A running dollar total and a growing 3D
+town — houses, market stalls, wells, trees, schools — tie it all together as a
+physical stand-in for what you've funded.
 
 This is a portfolio/demo project. All charities and impact numbers are fictional, and
 no real money ever moves — by default the donate flow is fully simulated. A real
@@ -24,10 +24,12 @@ and ready to go (see below) if you want to demo the actual payment flow.
   the charge amount itself from the charity + unit count, never trusting a client-sent
   dollar figure.
 - **Map** — a 3D scene (React Three Fiber / Three.js) you can drag to rotate and pinch
-  to zoom, showing a stylized, low-poly physical representation of everything you've
-  funded: little houses for nights of shelter, bowls for meals, bottles for litres of
-  water, trees for reforestation, book stacks for textbooks — one model per unit funded,
-  up to 12 per cause.
+  to zoom: a little town that grows as you give. A house per night of shelter, a market
+  stall per meal, a well per litre of water, a tree per sapling, a school per textbook —
+  one building per unit funded, up to 12 per cause, each district connected to the town
+  center by a stone path. Built from a curated subset of Kenney's CC0-licensed
+  [Fantasy Town Kit](https://kenney.nl/assets/fantasy-town-kit) (`public/models/town/`)
+  rather than hand-rolled primitives.
 - **Settings** — a mock Account (editable display name) and Payment page (add/remove
   demo cards — brand, last 4 digits, and expiry only; never a full card number), both
   local and `localStorage`-backed. There's no real sign-in system behind either.
@@ -96,6 +98,8 @@ lib/
   account-store.ts              Mock editable display name
   cards-store.ts                Mock cards on file
   stripe.ts                     Server-side Stripe client
+public/
+  models/town/                  CC0 GLB models used by the 3D town (see LICENSE.txt there)
 ```
 
 ## Deploying to Vercel

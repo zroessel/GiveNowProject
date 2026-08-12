@@ -9,7 +9,7 @@ const ImpactScene3D = dynamic(() => import("@/components/ImpactScene3D"), {
   ssr: false,
   loading: () => (
     <div className="flex flex-1 items-center justify-center">
-      <p className="text-[13px] font-bold text-clay/40">Loading map…</p>
+      <p className="text-[13px] font-bold text-clay/40">Building your town…</p>
     </div>
   ),
 });
@@ -27,7 +27,7 @@ export default function MapPage() {
       <div className="flex flex-1 flex-col pt-[calc(4.5rem+env(safe-area-inset-top))]">
         {!hasAnyDonations && (
           <p className="px-6 pb-2 text-center text-[12px] font-medium text-clay/45">
-            Drag to look around — donate on Give to start filling in the map.
+            Drag to look around — donate on Give to start building the town.
           </p>
         )}
         <div className="relative flex-1">
@@ -37,8 +37,9 @@ export default function MapPage() {
 
       <footer className="px-6 pb-6 pt-3">
         <p className="text-center text-[11px] font-medium text-clay/35">
-          A physical stand-in for your giving — one model per unit funded, up to 12 per
-          cause.
+          A physical stand-in for your giving — a house per night of shelter, a stall
+          per meal, a well per litre, a tree per sapling, a school per textbook. Up to
+          12 buildings shown per cause.
         </p>
       </footer>
     </div>
