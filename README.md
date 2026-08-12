@@ -20,12 +20,12 @@ concept.
   cost-per-outcome data (e.g. *"$5 CAD = 2 hot meals delivered this week"*), not a
   generic thank-you. If Stripe test keys are configured (see below), it routes through a
   real Stripe Checkout session first.
-- **Tap & Feed** — a small tap-to-feed mini-game. Tapping an animal simulates a
-  sponsor-funded micro-donation with a little bounce/sparkle animation. No losing, no
-  timer, just a satisfying loop.
-- **Impact meter** — every cause reports its own unit (litres, books, vaccines...), so to
-  keep one running total the app converts every dollar donated — from either screen —
-  into a shared universal unit ("meals provided") and persists it in `localStorage`.
+- **My Impact** — a visual breakdown of everything you've funded, grouped by cause:
+  water bottles, meals, trees, textbooks, and nights of shelter, each shown as a little
+  swarm of icons that grows as you give.
+- **Impact meter** — every cause reports its own unit (litres, meals, textbooks...), so
+  the app tracks both a running CAD total and a per-charity breakdown — from either
+  screen — and persists it in `localStorage`.
 
 ## Tech stack
 
@@ -66,7 +66,7 @@ this is the default, intended experience for this concept, not a broken state.
 ```
 app/
   page.tsx                  Home route (renders HomeScreen)
-  tap-and-feed/page.tsx     Tap & Feed route
+  tap-and-feed/page.tsx     My Impact route (visual per-cause breakdown)
   api/checkout/route.ts     Creates a Stripe Checkout Session
   api/checkout/verify/      Confirms a session after redirect back
   layout.tsx, globals.css   Shell, fonts, warm color theme
@@ -74,13 +74,12 @@ components/
   HomeScreen.tsx            Donate flow: cause card, donate button, reveal sheet
   CauseCard.tsx              Cause of the day display
   ImpactRevealSheet.tsx      Post-donation impact statement
-  AnimalTile.tsx             Tap & Feed animal + animation
+  ImpactCategoryCard.tsx     My Impact per-cause icon swarm tile
   ImpactMeter.tsx            Shared running total, shown on both screens
-  BottomNav.tsx               Give / Tap & Feed tab bar
+  BottomNav.tsx               Give / My Impact tab bar
 lib/
   charities.ts               Mock charity data + cause-of-the-day rotation
-  animals.ts                  Tap & Feed animal data
-  impact.ts                   Universal-unit conversion + impact statement logic
+  impact.ts                   Unit-cost conversion + impact statement logic
   impact-store.ts             Shared impact meter (localStorage-backed)
   stripe.ts                   Server-side Stripe client
 ```
