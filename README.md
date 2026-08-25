@@ -4,9 +4,9 @@ A concept donation app built around one idea: **donating should be one button aw
 
 No account creation, no scrolling through charity lists, no friction. Pick a cause,
 dial in an amount with a simple stepper, tap Donate, and instantly see a concrete
-impact statement — not a generic thank-you. A running dollar total and a growing 3D
-town — houses, market stalls, wells, trees, schools — tie it all together as a
-physical stand-in for what you've funded.
+impact statement — not a generic thank-you. A running dollar total and a per-cause
+impact page — water bottles, meals, trees, textbooks, nights of shelter — tie it all
+together as a visual record of what you've funded.
 
 This is a portfolio/demo project. All charities and impact numbers are fictional, and
 no real money ever moves — by default the donate flow is fully simulated. A real
@@ -23,16 +23,10 @@ and ready to go (see below) if you want to demo the actual payment flow.
   routes through a real Stripe Checkout session first — the server always recomputes
   the charge amount itself from the charity + unit count, never trusting a client-sent
   dollar figure.
-- **Map** — a 3D scene (React Three Fiber / Three.js) you can drag to rotate and pinch
-  to zoom: a little town that grows as you give, along two real streets meeting at a
-  central well. A house per night of shelter, a market stall per meal, a well per litre
-  of water, a tree per sapling, a school per textbook — one building per unit funded, up
-  to 12 per cause, interleaved so neighboring buildings are usually different types
-  rather than grouped by cause. Buildings line both sides of the main street first, then
-  spill onto a cross street once it fills up. The ground is a large low-poly terrain —
-  flat where the town sits, gently faceted further out. Built from a curated subset of
-  Kenney's CC0-licensed [Fantasy Town Kit](https://kenney.nl/assets/fantasy-town-kit)
-  (`public/models/town/`) rather than hand-rolled primitives.
+- **My Impact** — a per-cause breakdown of everything you've funded: water bottles,
+  meals, trees, textbooks, and nights of shelter, each shown as a photo tile with a
+  running count and a little swarm of icons that fills in as you give. A hero stat up
+  top totals every unit funded across all five causes.
 - **Settings** — a mock Account (editable display name) and Payment page (add/remove
   demo cards — brand, last 4 digits, and expiry only; never a full card number), both
   local and `localStorage`-backed. There's no real sign-in system behind either.
@@ -41,7 +35,6 @@ and ready to go (see below) if you want to demo the actual payment flow.
 
 - Next.js (App Router) + TypeScript + React
 - Tailwind CSS v4
-- React Three Fiber + Three.js + drei for the 3D impact map
 - Stripe Checkout (test mode, optional) for the donate flow
 - No backend/database — local component state + `localStorage` for everything that
   persists (impact totals, per-charity breakdown, account, cards)
@@ -78,7 +71,7 @@ this is the default, intended experience for this concept, not a broken state.
 ```
 app/
   page.tsx                    Home route (renders HomeScreen)
-  map/page.tsx                 3D impact map
+  map/page.tsx                 My Impact route (per-cause visual breakdown)
   settings/page.tsx            Settings list
   settings/account/page.tsx    Mock editable profile
   settings/payment/page.tsx    Mock cards on file
@@ -88,21 +81,19 @@ app/
 components/
   HomeScreen.tsx                Donate flow: banner, stepper, dropdown, reveal sheet
   CauseCard.tsx                 Full-height hero banner (photo or icon) behind the header
-  AppHeader.tsx                 Shared floating header bar (Give / Map / Settings)
+  AppHeader.tsx                 Shared floating header bar (Give / My Impact / Settings)
   ImpactRevealSheet.tsx         Post-donation impact statement
-  ImpactScene3D.tsx              The 3D map itself (client-only, dynamically imported)
+  ImpactCategoryCard.tsx         My Impact per-cause photo tile + icon swarm
   ImpactMeter.tsx                Running dollar total, shown in the header
-  BottomNav.tsx                  Give / Map / Settings tab bar
+  BottomNav.tsx                  Give / My Impact / Settings tab bar
 lib/
   charities.ts                  Mock charity data (name, cost/unit, icon, photo)
   impact.ts                     Stepper bounds + amount/unit conversion helpers
   impact-store.ts               Running CAD total (localStorage-backed)
-  donations-store.ts            Units funded per charity, feeds the 3D map
+  donations-store.ts            Units funded per charity, feeds My Impact
   account-store.ts              Mock editable display name
   cards-store.ts                Mock cards on file
   stripe.ts                     Server-side Stripe client
-public/
-  models/town/                  CC0 GLB models used by the 3D town (see LICENSE.txt there)
 ```
 
 ## Deploying to Vercel
