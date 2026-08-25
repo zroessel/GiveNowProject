@@ -54,14 +54,8 @@ export function addCharityUnits(charityId: string, units: number) {
   persist();
 }
 
-export function resetDonations() {
-  ensureInitialized();
-  breakdown = EMPTY_BREAKDOWN;
-  persist();
-}
-
 /** Units funded per charity (e.g. meals, litres, trees) — feeds the 3D impact map. */
 export function useDonationsByCharity() {
   const unitsByCharity = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  return { unitsByCharity, addCharityUnits, resetDonations };
+  return { unitsByCharity, addCharityUnits };
 }
